@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">FindTheKing</string>
+    <string-array name="spinner_items1">
+        <item>Donlon</item>
+        <item>Enchai</item>
+        <item>Jebing</item>
+        <item>Sapier</item>
+        <item>Lerbin</item>
+        <item>Pingasor</item>
+    </string-array>
+
+    <string-array name="spinner_items2">
+        <item>Donlon</item>
+        <item>Enchai</item>
+        <item>Jebing</item>
+        <item>Sapier</item>
+        <item>Lerbin</item>
+        <item>Pingasor</item>
+    </string-array>
+
+    <string-array name="spinner_items3">
+        <item>Donlon</item>
+        <item>Enchai</item>
+        <item>Jebing</item>
+        <item>Sapier</item>
+        <item>Lerbin</item>
+        <item>Pingasor</item>
+    </string-array>
+
+    <string-array name="spinner_items4">
+        <item>Donlon</item>
+        <item>Enchai</item>
+        <item>Jebing</item>
+        <item>Sapier</item>
+        <item>Lerbin</item>
+        <item>Pingasor</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
+

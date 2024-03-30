@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".homeFragment">
+
+    <TextView
+        android:id="@+id/headingText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Finding Falcone!"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        />
+
+    <TextView
+        android:id="@+id/introText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Planets you want to search in"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:layout_margin="16dp"
+        android:paddingBottom="16dp"
+
+        />
+
+
+    <TextView
+        android:id="@+id/destination1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Destination 1"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
+        />
+
+    <Spinner
+        android:id="@+id/spinnerExample1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/spinner_items1"
+        />
+
+    <TextView
+        android:id="@+id/destination2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Destination 2"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
+        />
+
+    <Spinner
+        android:id="@+id/spinnerExample2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/spinner_items2"
+        />
+
+    <TextView
+        android:id="@+id/destination3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Destination 3"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
+        />
+    <Spinner
+        android:id="@+id/spinnerExample3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/spinner_items3"
+        />
+
+    <TextView
+        android:id="@+id/destination4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Destination 4"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
+        />
+
+    <Spinner
+        android:id="@+id/spinnerExample4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/spinner_items4"
+        />
+
+</FrameLayout>
