@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".homeFragment">
 
+<!--    Heading-->
     <TextView
         android:id="@+id/headingText"
         android:layout_width="match_parent"
@@ -14,6 +16,7 @@
         android:textSize="24sp"
         />
 
+<!-- Intro to game   -->
     <TextView
         android:id="@+id/introText"
         android:layout_width="match_parent"
@@ -23,10 +26,9 @@
         android:textSize="14sp"
         android:layout_margin="16dp"
         android:paddingBottom="16dp"
-
         />
 
-
+    <!--First destination-->
     <TextView
         android:id="@+id/destination1"
         android:layout_width="match_parent"
@@ -38,28 +40,56 @@
         />
 
     <Spinner
-        android:id="@+id/spinnerExample1"
+        android:id="@+id/planet1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/spinner_items1"
+        android:entries="@array/planet_items1"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
         />
+    <RadioGroup
+        android:id="@+id/planet1_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" /> <!-- Initially hidden -->
+<!--radio buttons with options-->
+
+<!--    <RadioButton-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:text="King Shan"-->
+<!--        android:id="@+id/king_shan"-->
+<!--        android:padding="8dp"-->
+<!--        android:textSize="14sp"-->
+<!--        android:textStyle="bold"-->
+<!--        />-->
 
     <TextView
         android:id="@+id/destination2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Destination 2"
+        android:paddingTop="8dp"
         android:textSize="14sp"
         android:textStyle="bold"
         android:paddingBottom="4dp"
         />
 
     <Spinner
-        android:id="@+id/spinnerExample2"
+        android:id="@+id/planet2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/spinner_items2"
+        android:entries="@array/planet_items2"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
         />
+    <RadioGroup
+        android:id="@+id/planet2_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" /> <!-- Initially hidden -->
 
     <TextView
         android:id="@+id/destination3"
@@ -69,13 +99,23 @@
         android:textSize="14sp"
         android:textStyle="bold"
         android:paddingBottom="4dp"
+        android:paddingTop="8dp"
         />
     <Spinner
-        android:id="@+id/spinnerExample3"
+        android:id="@+id/planet3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/spinner_items3"
+        android:entries="@array/planet_items3"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
         />
+    <RadioGroup
+        android:id="@+id/planet3_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" /> <!-- Initially hidden -->
+
 
     <TextView
         android:id="@+id/destination4"
@@ -84,14 +124,30 @@
         android:text="Destination 4"
         android:textSize="14sp"
         android:textStyle="bold"
+        android:paddingTop="8dp"
         android:paddingBottom="4dp"
         />
 
     <Spinner
-        android:id="@+id/spinnerExample4"
+        android:id="@+id/planet4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/spinner_items4"
+        android:entries="@array/planet_items4"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
         />
+    <RadioGroup
+        android:id="@+id/planet4_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" /> <!-- Initially hidden -->
 
-</FrameLayout>
+    <Button
+        android:id="@+id/buttonToFinalFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Find Falcone"
+        android:layout_gravity="center"/>
+
+</LinearLayout>
