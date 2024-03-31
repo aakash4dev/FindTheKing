@@ -6,7 +6,8 @@
     android:orientation="vertical"
     tools:context=".homeFragment">
 
-<!--    Heading-->
+
+    <!--    Heading-->
     <TextView
         android:id="@+id/headingText"
         android:layout_width="match_parent"
@@ -15,6 +16,36 @@
         android:textAlignment="center"
         android:textSize="24sp"
         />
+
+    <!--    Failure Linear Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:id="@+id/failureLayout"
+        >
+        <TextView
+            android:id="@+id/failureText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="API not working :("
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:layout_margin="16dp"
+            android:paddingBottom="16dp"
+            />
+    </LinearLayout>
+
+<!--    Success Layout -->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:visibility="gone"
+    android:id="@+id/successLayout"
+    >
+
 
 <!-- Intro to game   -->
     <TextView
@@ -53,17 +84,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone" /> <!-- Initially hidden -->
-<!--radio buttons with options-->
 
-<!--    <RadioButton-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:text="King Shan"-->
-<!--        android:id="@+id/king_shan"-->
-<!--        android:padding="8dp"-->
-<!--        android:textSize="14sp"-->
-<!--        android:textStyle="bold"-->
-<!--        />-->
 
     <TextView
         android:id="@+id/destination2"
@@ -149,5 +170,15 @@
         android:layout_height="wrap_content"
         android:text="Find Falcone"
         android:layout_gravity="center"/>
+
+</LinearLayout>
+
+
+
+<!--    Text with visibility : API not working -->
+
+
+
+
 
 </LinearLayout>

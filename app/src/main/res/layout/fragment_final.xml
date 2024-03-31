@@ -7,13 +7,54 @@
     tools:context=".FinalFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
+<!--heading : selected planet -->
     <TextView
+        android:id="@+id/headingText"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:text="Selected Planet"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        />
 
+<!-- planet selected -->
+    <TextView
+        android:id="@+id/planet_selected"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Planet Selected"
+        android:textSize="20sp"
+        android:textAlignment="center"
 
-<!--back_button-->
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
+
+        />
+
+<!--    heading: distance -->
+    <TextView
+        android:id="@+id/distanceText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Distance"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        />
+
+<!--    distance -->
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="Distance"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"
+        />
+
+    <!--back_button-->
     <Button
         android:id="@+id/back_button"
         android:layout_width="wrap_content"
@@ -23,8 +64,5 @@
         android:layout_marginTop="16dp"
         android:onClick="backButton"
         />
-
-
-
 
 </LinearLayout>

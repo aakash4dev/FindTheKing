@@ -13,6 +13,8 @@ android {
     namespace = "com.example.findtheking"
     compileSdk = 34
 
+
+
     defaultConfig {
         applicationId = "com.example.findtheking"
         minSdk = 24

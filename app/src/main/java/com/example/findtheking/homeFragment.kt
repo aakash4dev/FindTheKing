@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import kotlinx.coroutines.*
@@ -21,7 +22,7 @@ import org.json.JSONArray
 
 data class Vehicle(
     val name: String,
-    val total_no: Int,
+    var total_no: Int,
     val max_distance: Int,
     val speed: Int
 )
@@ -52,25 +53,20 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        var APIFetchedSuccess = true
+
         // fetchVehicles before inflating the layout
-        val fetchResult = runBlocking {
+        val fetchVehicleResult = runBlocking {
             fetchVehicles().await()
         }
-        if (fetchResult.success) {
+        if (fetchVehicleResult.success) {
             Toast.makeText(requireContext(), "Successfully fetched vehicle data", Toast.LENGTH_LONG)
                 .show()
         } else {
             Toast.makeText(requireContext(), "Failed to fetch vehicle data", Toast.LENGTH_LONG)
                 .show()
-            // make fetchResult.vahicles list by own
-            fetchResult.vehicles = listOf(
-                Vehicle("Failed", 2, 200, 2),
-                Vehicle("To", 1, 300, 4),
-                Vehicle("Get", 1, 400, 5),
-                Vehicle("Space ship list", 2, 600, 10)
-            )
-
-
+            APIFetchedSuccess = false
         }
 
         // fetch planets list
@@ -83,24 +79,26 @@ class HomeFragment : Fragment() {
         } else {
             Toast.makeText(requireContext(), "Failed to fetch planet data", Toast.LENGTH_LONG)
                 .show()
+            APIFetchedSuccess = false
         }
+
+
         // fetch token id
         val tokenId = runBlocking {
             fetchToken().await()
         }
-        if (tokenId == null || tokenId == "Error fetching token" || tokenId == "") {
+        if (tokenId == "Error fetching token" || tokenId == "") {
             Toast.makeText(requireContext(), "Failed to fetch token", Toast.LENGTH_LONG)
                 .show()
         } else {
             Toast.makeText(requireContext(), tokenId, Toast.LENGTH_LONG)
                 .show()
         }
-        var selectedPlants = mutableListOf<String>()
-        var selectedVehicles = mutableListOf<String>()
 
-        lateinit var vehicles: List<Vehicle>
 
-        var rootView: View = inflater.inflate(R.layout.fragment_home, container, false)
+        val selectedPlants = mutableListOf<String>("","","","")
+        val selectedVehicles = mutableListOf<String>("", "", "", "")
+        val rootView: View = inflater.inflate(R.layout.fragment_home, container, false)
 
         val planet1: Spinner = rootView.findViewById(R.id.planet1)
         val planet2: Spinner = rootView.findViewById(R.id.planet2)
@@ -112,252 +110,354 @@ class HomeFragment : Fragment() {
         var isFirstSelection3 = true
         var isFirstSelection4 = true
 
-        var adapter1: ArrayAdapter<CharSequence>
-        var adapter2: ArrayAdapter<CharSequence>
-        var adapter3: ArrayAdapter<CharSequence>
-        var adapter4: ArrayAdapter<CharSequence>
+        val adapter1: ArrayAdapter<CharSequence>
+        val adapter2: ArrayAdapter<CharSequence>
+        val adapter3: ArrayAdapter<CharSequence>
+        val adapter4: ArrayAdapter<CharSequence>
 
 
-if (!fetchPlanetsResult.success) {
-    // adapters for the spinners
-     adapter1 = ArrayAdapter(requireContext(), R.layout.custom_planet, listOf("Failed", "Failed", "Failed", "Failed", "Failed", "Failed"))
-    adapter2= ArrayAdapter(requireContext(), R.layout.custom_planet, listOf("To", "To", "To", "To", "To", "To"))
-     adapter3 = ArrayAdapter(requireContext(), R.layout.custom_planet, listOf("Get", "Get", "Get", "Get", "Get", "Get"))
-     adapter4 = ArrayAdapter(requireContext(), R.layout.custom_planet, listOf("Planet list", "Enchai", "Jebing", "Sapir", "Lerbin", "Pingasor"))
+if (!APIFetchedSuccess) {
+    // set error visibility true
+    val failureLayout:LinearLayout  = rootView.findViewById(R.id.failureLayout)
+    failureLayout.visibility = View.VISIBLE
 }else {
-     adapter1 = ArrayAdapter(requireContext(), R.layout.custom_planet, fetchPlanetsResult.planets!!.map { it.name })
-     adapter2 = ArrayAdapter(requireContext(), R.layout.custom_planet, fetchPlanetsResult.planets!!.map { it.name })
-     adapter3= ArrayAdapter(requireContext(), R.layout.custom_planet, fetchPlanetsResult.planets!!.map { it.name })
-     adapter4 = ArrayAdapter(requireContext(), R.layout.custom_planet, fetchPlanetsResult.planets!!.map { it.name })
+    val successLayout:LinearLayout  = rootView.findViewById(R.id.successLayout)
+    successLayout.visibility = View.VISIBLE
 
+     adapter1 = ArrayAdapter(requireContext(), R.layout.custom_planet, fetchPlanetsResult.planets!!.map { it.name })
+     adapter2 = ArrayAdapter(requireContext(), R.layout.custom_planet, fetchPlanetsResult.planets.map { it.name })
+     adapter3= ArrayAdapter(requireContext(), R.layout.custom_planet, fetchPlanetsResult.planets.map { it.name })
+     adapter4 = ArrayAdapter(requireContext(), R.layout.custom_planet, fetchPlanetsResult.planets.map { it.name })
+
+    planet1.adapter = adapter1
+    planet1.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+        }
+
+        @SuppressLint("SetTextI18n")
+        override fun onItemSelected(
+            parent: AdapterView<*>?,
+            view: View?,
+            position: Int,
+            idid: Long
+        ) {
+            if (isFirstSelection1) {
+                isFirstSelection1 = false
+                return
+            } else {
+                val item = parent?.getItemAtPosition(position).toString()
+                Toast.makeText(requireContext(), "Selected: $item", Toast.LENGTH_LONG).show()
+
+                selectedPlants[0] = item // crashing on this line
+
+//                    selectedPlants.add(item)
+
+                // make other groups invisible
+                val radioGroup2 = rootView.findViewById<RadioGroup>(R.id.planet2_radio_group)
+                radioGroup2.visibility = View.GONE
+                val radioGroup3 = rootView.findViewById<RadioGroup>(R.id.planet3_radio_group)
+                radioGroup3.visibility = View.GONE
+                val radioGroup4 = rootView.findViewById<RadioGroup>(R.id.planet4_radio_group)
+                radioGroup4.visibility = View.GONE
+
+                // Example for setting up radio buttons for the first planet
+                val radioGroup = rootView.findViewById<RadioGroup>(R.id.planet1_radio_group)
+                radioGroup.removeAllViews() // Clear previous radio buttons
+                radioGroup.visibility = View.VISIBLE // Make the RadioGroup visible
+
+                fetchVehicleResult.vehicles?.forEachIndexed { index, vehicle ->
+                    val radioButton = RadioButton(requireContext()).apply {
+                        text = "${vehicle.name} (${vehicle.total_no})"
+                        id = View.generateViewId()
+                        tag = index // Use the vehicle's index as the tag for identification
+                    }
+                    radioGroup.addView(radioButton)
+                }
+
+                // crashing on this loop call
+                // Listen for changes in radio button selection
+//                radioGroup.setOnClickListener(View.OnClickListener {
+//
+//                    // decrease counting by one of fetchVehicleResult.vehicles[0].total_no
+//                    var validVehicle = false
+//                    for (i in 0 until fetchVehicleResult.vehicles!!.size) {
+//                            if (fetchVehicleResult.vehicles?.get(i)?.total_no!! > 0){
+//                                fetchVehicleResult.vehicles?.get(i)?.total_no = fetchVehicleResult.vehicles?.get(i)?.total_no!! - 1
+//
+//                                val radioButton = radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
+//                                val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
+//                                selectedVehicles[0] =
+//                                    fetchVehicleResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
+//
+//                                validVehicle = true
+//                            }
+//                    }
+//                    if (!validVehicle) {
+//                        Toast.makeText(requireContext(), "Vehicle use Maxed", Toast.LENGTH_LONG).show()
+//                    }
+//
+//
+//                })
+
+                radioGroup.setOnCheckedChangeListener { group, checkedId ->
+                    val radioButton = group.findViewById<RadioButton>(checkedId)
+                    val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
+                    selectedVehicles[0] =
+                        fetchVehicleResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
+                }
+
+            }
+        }
+    }
+
+
+    planet2.adapter = adapter2
+    planet2.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+        }
+
+        @SuppressLint("SetTextI18n", "CutPasteId")
+        override fun onItemSelected(
+            parent: AdapterView<*>?,
+            view: View?,
+            position: Int,
+            idid: Long
+        ) {
+            if (isFirstSelection2) {
+                isFirstSelection2 = false
+                return
+            } else {
+                val item = parent?.getItemAtPosition(position).toString()
+                Toast.makeText(requireContext(), "Selected: $item", Toast.LENGTH_LONG).show()
+
+                selectedPlants[1] = item
+//                    selectedPlants.add(item)
+
+                val radioGroup1 = rootView.findViewById<RadioGroup>(R.id.planet1_radio_group)
+                radioGroup1.visibility = View.GONE
+                val radioGroup3 = rootView.findViewById<RadioGroup>(R.id.planet3_radio_group)
+                radioGroup3.visibility = View.GONE
+                val radioGroup4 = rootView.findViewById<RadioGroup>(R.id.planet4_radio_group)
+                radioGroup4.visibility = View.GONE
+
+                // Example for setting up radio buttons for the first planet
+                val radioGroup = rootView.findViewById<RadioGroup>(R.id.planet2_radio_group)
+                radioGroup.removeAllViews() // Clear previous radio buttons
+                radioGroup.visibility = View.VISIBLE // Make the RadioGroup visible
+
+                fetchVehicleResult.vehicles?.forEachIndexed { index, vehicle ->
+                    val radioButton = RadioButton(requireContext()).apply {
+                        text = "${vehicle.name} (${vehicle.total_no})"
+                        id = View.generateViewId()
+                        tag = index // Use the vehicle's index as the tag for identification
+                    }
+                    radioGroup.addView(radioButton)
+                }
+
+                // Listen for changes in radio button selection
+                radioGroup.setOnCheckedChangeListener { group, checkedId ->
+                    val radioButton = group.findViewById<RadioButton>(checkedId)
+                    val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
+                    selectedVehicles[1] =
+                        fetchVehicleResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
+//                        selectedVehicles.add(fetchResult.vehicles?.get(vehicleIndex!!)?.name.toString())
+                }
+
+//                radioGroup.setOnClickListener(View.OnClickListener {
+//
+//                    // decrease counting by one of fetchVehicleResult.vehicles[0].total_no
+//                    var validVehicle = false
+//                    for (i in 0 until fetchVehicleResult.vehicles!!.size) {
+//                        if (fetchVehicleResult.vehicles?.get(i)?.total_no!! > 0) {
+//                            fetchVehicleResult.vehicles?.get(i)?.total_no =
+//                                fetchVehicleResult.vehicles?.get(i)?.total_no!! - 1
+//
+//                            val radioButton =
+//                                radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
+//                            val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
+//                            selectedVehicles[1] =
+//                                fetchVehicleResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
+//
+//                            validVehicle = true
+//                        }
+//                    }
+//                    if (!validVehicle) {
+//                        Toast.makeText(requireContext(), "Vehicle use Maxed", Toast.LENGTH_LONG)
+//                            .show()
+//                    }
+//                })
+            }
+        }
+    }
+
+    planet3.adapter = adapter3
+    planet3.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+        }
+
+        @SuppressLint("SetTextI18n", "CutPasteId")
+        override fun onItemSelected(
+            parent: AdapterView<*>?,
+            view: View?,
+            position: Int,
+            idid: Long
+        ) {
+            if (isFirstSelection3) {
+                isFirstSelection3 = false
+                return
+            } else {
+                val item = parent?.getItemAtPosition(position).toString()
+                Toast.makeText(requireContext(), "Selected: $item", Toast.LENGTH_LONG).show()
+
+                selectedPlants[2] = item
+//                    selectedPlants.add(item)
+
+
+                val radioGroup1 = rootView.findViewById<RadioGroup>(R.id.planet1_radio_group)
+                radioGroup1.visibility = View.GONE
+                val radioGroup2 = rootView.findViewById<RadioGroup>(R.id.planet2_radio_group)
+                radioGroup2.visibility = View.GONE
+                val radioGroup4 = rootView.findViewById<RadioGroup>(R.id.planet4_radio_group)
+                radioGroup4.visibility = View.GONE
+
+
+                // Example for setting up radio buttons for the first planet
+                val radioGroup = rootView.findViewById<RadioGroup>(R.id.planet3_radio_group)
+                radioGroup.removeAllViews() // Clear previous radio buttons
+                radioGroup.visibility = View.VISIBLE // Make the RadioGroup visible
+
+                fetchVehicleResult.vehicles?.forEachIndexed { index, vehicle ->
+                    val radioButton = RadioButton(requireContext()).apply {
+                        text = "${vehicle.name} (${vehicle.total_no})"
+                        id = View.generateViewId()
+                        tag = index // Use the vehicle's index as the tag for identification
+                    }
+                    radioGroup.addView(radioButton)
+                }
+
+                // Listen for changes in radio button selection
+                radioGroup.setOnCheckedChangeListener { group, checkedId ->
+                    val radioButton = group.findViewById<RadioButton>(checkedId)
+                    val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
+                    selectedVehicles[2] =
+                        fetchVehicleResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
+//                        selectedVehicles.add(fetchResult.vehicles?.get(vehicleIndex!!)?.name.toString())
+                }
+
+//                radioGroup.setOnClickListener(View.OnClickListener {
+//
+//                    // decrease counting by one of fetchVehicleResult.vehicles[0].total_no
+//                    var validVehicle = false
+//                    for (i in 0 until fetchVehicleResult.vehicles!!.size) {
+//                        if (fetchVehicleResult.vehicles?.get(i)?.total_no!! > 0) {
+//                            fetchVehicleResult.vehicles?.get(i)?.total_no =
+//                                fetchVehicleResult.vehicles?.get(i)?.total_no!! - 1
+//
+//                            val radioButton =
+//                                radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
+//                            val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
+//                            selectedVehicles[2] =
+//                                fetchVehicleResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
+//
+//                            validVehicle = true
+//                        }
+//                    }
+//                    if (!validVehicle) {
+//                        Toast.makeText(requireContext(), "Vehicle use Maxed", Toast.LENGTH_LONG)
+//                            .show()
+//                    }
+//                })
+
+            }
+        }
+    }
+
+    planet4.adapter = adapter4
+    planet4.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+        }
+
+        @SuppressLint("CutPasteId", "SetTextI18n")
+        override fun onItemSelected(
+            parent: AdapterView<*>?,
+            view: View?,
+            position: Int,
+            idid: Long
+        ) {
+            if (isFirstSelection4) {
+                isFirstSelection4 = false
+                return
+            } else {
+                val item = parent?.getItemAtPosition(position).toString()
+                Toast.makeText(requireContext(), "Selected: $item", Toast.LENGTH_LONG).show()
+
+                selectedPlants[3] = item
+//                    selectedPlants.add(item)
+
+                val radioGroup1 = rootView.findViewById<RadioGroup>(R.id.planet1_radio_group)
+                radioGroup1.visibility = View.GONE
+                val radioGroup2 = rootView.findViewById<RadioGroup>(R.id.planet2_radio_group)
+                radioGroup2.visibility = View.GONE
+                val radioGroup3 = rootView.findViewById<RadioGroup>(R.id.planet3_radio_group)
+                radioGroup3.visibility = View.GONE
+
+
+                // Example for setting up radio buttons for the first planet
+                val radioGroup = rootView.findViewById<RadioGroup>(R.id.planet4_radio_group)
+                radioGroup.removeAllViews() // Clear previous radio buttons
+                radioGroup.visibility = View.VISIBLE // Make the RadioGroup visible
+
+                fetchVehicleResult.vehicles?.forEachIndexed { index, vehicle ->
+                    val radioButton = RadioButton(requireContext()).apply {
+                        text = "${vehicle.name} (${vehicle.total_no})"
+                        id = View.generateViewId()
+                        tag = index // Use the vehicle's index as the tag for identification
+                    }
+                    radioGroup.addView(radioButton)
+                }
+
+                // Listen for changes in radio button selection
+                radioGroup.setOnCheckedChangeListener { group, checkedId ->
+                    val radioButton = group.findViewById<RadioButton>(checkedId)
+                    val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
+                    selectedVehicles[3] =
+                        fetchVehicleResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
+
+//                        selectedVehicles.add(fetchResult.vehicles?.get(vehicleIndex!!)?.name.toString())
+                }
+//                radioGroup.setOnClickListener(View.OnClickListener {
+//
+//                    // decrease counting by one of fetchVehicleResult.vehicles[0].total_no
+//                    var validVehicle = false
+//                    for (i in 0 until fetchVehicleResult.vehicles!!.size) {
+//                        if (fetchVehicleResult.vehicles?.get(i)?.total_no!! > 0) {
+//                            fetchVehicleResult.vehicles?.get(i)?.total_no =
+//                                fetchVehicleResult.vehicles?.get(i)?.total_no!! - 1
+//
+//                            val radioButton =
+//                                radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
+//                            val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
+//                            selectedVehicles[3] =
+//                                fetchVehicleResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
+//
+//                            validVehicle = true
+//                        }
+//                    }
+//                    if (!validVehicle) {
+//                        Toast.makeText(requireContext(), "Vehicle use Maxed", Toast.LENGTH_LONG)
+//                            .show()
+//                        radioGroup.findViewById<RadioButton>(radioGroup.checkedRadioButtonId).isChecked = false
+//
+//                    }
+//                })
+
+            }
+        }
+    }
 }
 
 
-        planet1.adapter = adapter1
-        planet1.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
 
-            @SuppressLint("SetTextI18n")
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                idid: Long
-            ) {
-                if (isFirstSelection1) {
-                    isFirstSelection1 = false
-                    return
-                } else {
-                    val item = parent?.getItemAtPosition(position).toString()
-                    Toast.makeText(requireContext(), "Selected: $item", Toast.LENGTH_LONG).show()
-
-//                    selectedPlants[0] = item // crashing on this line
-
-                    selectedPlants.add(item)
-
-                    // make other groups invisible
-                    val radioGroup2 = rootView.findViewById<RadioGroup>(R.id.planet2_radio_group)
-                    radioGroup2.visibility = View.GONE
-                    val radioGroup3 = rootView.findViewById<RadioGroup>(R.id.planet3_radio_group)
-                    radioGroup3.visibility = View.GONE
-                    val radioGroup4 = rootView.findViewById<RadioGroup>(R.id.planet4_radio_group)
-                    radioGroup4.visibility = View.GONE
-
-                    // Example for setting up radio buttons for the first planet
-                    val radioGroup = rootView.findViewById<RadioGroup>(R.id.planet1_radio_group)
-                    radioGroup.removeAllViews() // Clear previous radio buttons
-                    radioGroup.visibility = View.VISIBLE // Make the RadioGroup visible
-
-                    fetchResult.vehicles?.forEachIndexed { index, vehicle ->
-                        val radioButton = RadioButton(requireContext()).apply {
-                            text = "${vehicle.name} (${vehicle.total_no})"
-                            id = View.generateViewId()
-                            tag = index // Use the vehicle's index as the tag for identification
-                        }
-                        radioGroup.addView(radioButton)
-                    }
-
-                    // crashing on this loop call
-                    // Listen for changes in radio button selection
-//                    radioGroup.setOnCheckedChangeListener { group, checkedId ->
-//                        val radioButton = group.findViewById<RadioButton>(checkedId)
-//                        val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
-//                        selectedVehicles[0] =
-//                            fetchResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
-//                    }
-
-                }
-            }
-        }
-
-
-        planet2.adapter = adapter2
-        planet2.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-
-            @SuppressLint("SetTextI18n", "CutPasteId")
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                idid: Long
-            ) {
-                if (isFirstSelection2) {
-                    isFirstSelection2 = false
-                    return
-                } else {
-                    val item = parent?.getItemAtPosition(position).toString()
-                    Toast.makeText(requireContext(), "Selected: $item", Toast.LENGTH_LONG).show()
-
-//                    selectedPlants[1] = item
-                    selectedPlants.add(item)
-
-                    val radioGroup1 = rootView.findViewById<RadioGroup>(R.id.planet1_radio_group)
-                    radioGroup1.visibility = View.GONE
-                    val radioGroup3 = rootView.findViewById<RadioGroup>(R.id.planet3_radio_group)
-                    radioGroup3.visibility = View.GONE
-                    val radioGroup4 = rootView.findViewById<RadioGroup>(R.id.planet4_radio_group)
-                    radioGroup4.visibility = View.GONE
-
-                    // Example for setting up radio buttons for the first planet
-                    val radioGroup = rootView.findViewById<RadioGroup>(R.id.planet2_radio_group)
-                    radioGroup.removeAllViews() // Clear previous radio buttons
-                    radioGroup.visibility = View.VISIBLE // Make the RadioGroup visible
-
-                    fetchResult.vehicles?.forEachIndexed { index, vehicle ->
-                        val radioButton = RadioButton(requireContext()).apply {
-                            text = "${vehicle.name} (${vehicle.total_no})"
-                            id = View.generateViewId()
-                            tag = index // Use the vehicle's index as the tag for identification
-                        }
-                        radioGroup.addView(radioButton)
-                    }
-
-                    // Listen for changes in radio button selection
-//                    radioGroup.setOnCheckedChangeListener { group, checkedId ->
-//                        val radioButton = group.findViewById<RadioButton>(checkedId)
-//                        val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
-//                        selectedVehicles[1] =
-//                            fetchResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
-//                    }
-                }
-            }
-        }
-
-        planet3.adapter = adapter3
-        planet3.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-
-            @SuppressLint("SetTextI18n", "CutPasteId")
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                idid: Long
-            ) {
-                if (isFirstSelection3) {
-                    isFirstSelection3 = false
-                    return
-                } else {
-                    val item = parent?.getItemAtPosition(position).toString()
-                    Toast.makeText(requireContext(), "Selected: $item", Toast.LENGTH_LONG).show()
-
-//                    selectedPlants[2] = item
-                    selectedPlants.add(item)
-
-
-                    val radioGroup1 = rootView.findViewById<RadioGroup>(R.id.planet1_radio_group)
-                    radioGroup1.visibility = View.GONE
-                    val radioGroup2 = rootView.findViewById<RadioGroup>(R.id.planet2_radio_group)
-                    radioGroup2.visibility = View.GONE
-                    val radioGroup4 = rootView.findViewById<RadioGroup>(R.id.planet4_radio_group)
-                    radioGroup4.visibility = View.GONE
-
-
-                    // Example for setting up radio buttons for the first planet
-                    val radioGroup = rootView.findViewById<RadioGroup>(R.id.planet3_radio_group)
-                    radioGroup.removeAllViews() // Clear previous radio buttons
-                    radioGroup.visibility = View.VISIBLE // Make the RadioGroup visible
-
-                    fetchResult.vehicles?.forEachIndexed { index, vehicle ->
-                        val radioButton = RadioButton(requireContext()).apply {
-                            text = "${vehicle.name} (${vehicle.total_no})"
-                            id = View.generateViewId()
-                            tag = index // Use the vehicle's index as the tag for identification
-                        }
-                        radioGroup.addView(radioButton)
-                    }
-
-                    // Listen for changes in radio button selection
-//                    radioGroup.setOnCheckedChangeListener { group, checkedId ->
-//                        val radioButton = group.findViewById<RadioButton>(checkedId)
-//                        val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
-//                        selectedVehicles[0] =
-//                            fetchResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
-//                    }
-
-                }
-            }
-        }
-
-        planet4.adapter = adapter4
-        planet4.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-
-            @SuppressLint("CutPasteId", "SetTextI18n")
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                idid: Long
-            ) {
-                if (isFirstSelection4) {
-                    isFirstSelection4 = false
-                    return
-                } else {
-                    val item = parent?.getItemAtPosition(position).toString()
-                    Toast.makeText(requireContext(), "Selected: $item", Toast.LENGTH_LONG).show()
-
-//                    selectedPlants[3] = item
-                    selectedPlants.add(item)
-
-                    val radioGroup1 = rootView.findViewById<RadioGroup>(R.id.planet1_radio_group)
-                    radioGroup1.visibility = View.GONE
-                    val radioGroup2 = rootView.findViewById<RadioGroup>(R.id.planet2_radio_group)
-                    radioGroup2.visibility = View.GONE
-                    val radioGroup3 = rootView.findViewById<RadioGroup>(R.id.planet3_radio_group)
-                    radioGroup3.visibility = View.GONE
-
-
-                    // Example for setting up radio buttons for the first planet
-                    val radioGroup = rootView.findViewById<RadioGroup>(R.id.planet4_radio_group)
-                    radioGroup.removeAllViews() // Clear previous radio buttons
-                    radioGroup.visibility = View.VISIBLE // Make the RadioGroup visible
-
-                    fetchResult.vehicles?.forEachIndexed { index, vehicle ->
-                        val radioButton = RadioButton(requireContext()).apply {
-                            text = "${vehicle.name} (${vehicle.total_no})"
-                            id = View.generateViewId()
-                            tag = index // Use the vehicle's index as the tag for identification
-                        }
-                        radioGroup.addView(radioButton)
-                    }
-
-                    // Listen for changes in radio button selection
-//                    radioGroup.setOnCheckedChangeListener { group, checkedId ->
-//                        val radioButton = group.findViewById<RadioButton>(checkedId)
-//                        val vehicleIndex = radioButton.tag as? Int // Retrieve the vehicle index
-//                        selectedVehicles[0] =
-//                            fetchResult.vehicles?.get(vehicleIndex!!)?.name.toString() // Update the selected vehicle for planet 1
-//                    }
-
-                }
-            }
-        }
 
 
         // Find the button by its ID and set up the click listener
@@ -367,14 +467,64 @@ if (!fetchPlanetsResult.success) {
 
 
             val result = findFalconeAPI(tokenId, selectedPlants, selectedVehicles)
-            if (result.toString() == "API error") {
-                Toast.makeText(requireContext(), "API error occured", Toast.LENGTH_LONG)
+            // api is not working currently, so making result by own
+
+            // sample response
+            val responseStatus="success"
+            val planetName = selectedPlants.random()
+
+            if (responseStatus == "success") {
+                Toast.makeText(requireContext(), "Planet found: $planetName", Toast.LENGTH_LONG)
                     .show()
             } else {
-                Toast.makeText(requireContext(), "result: "+result.toString(), Toast.LENGTH_LONG)
+                Toast.makeText(requireContext(), "Planet not found", Toast.LENGTH_LONG)
                     .show()
-                // ye kam nai kar rha
             }
+
+
+            // find the distance
+            fetchPlanetsResult.planets?.forEach {
+                if (it.name == planetName) {
+                    val distance = it.distance
+                    Toast.makeText(requireContext(), "Distance: ${distance.toString()}", Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+
+            // redirect to final fragment
+//            val finalFragment = FinalFragment()
+//            requireActivity().supportFragmentManager.beginTransaction().apply {
+//                replace(R.id.fragment_container, finalFragment)
+//                addToBackStack(null)
+//                commit()
+//            }
+            val finalFragment = FinalFragment().apply {
+                // Create a bundle to hold the arguments
+                val args = Bundle().apply {
+                    putString("planetName", planetName) // Use the actual variable or value here
+                    putInt("distance", 100) // Use the actual variable or value here
+                }
+                // Set the arguments on the fragment
+                arguments = args
+            }
+
+            // Now perform the fragment transaction as before
+            requireActivity().supportFragmentManager.beginTransaction().apply {
+                replace(R.id.fragment_container, finalFragment)
+                addToBackStack(null) // Optional: Add this transaction to the back stack
+                commit()
+            }
+
+
+
+        //            if (result.toString() == "API error") {
+//                Toast.makeText(requireContext(), "API error occured", Toast.LENGTH_LONG)
+//                    .show()
+//            } else {
+//                Toast.makeText(requireContext(), "result: "+result.toString(), Toast.LENGTH_LONG)
+//                    .show()
+//                // ye kam nai kar rha
+//            }
 
             // todo: handle the result. possible results
             // sample response {"status":"success","planet_name":"Enchai"} OR
@@ -485,6 +635,8 @@ if (!fetchPlanetsResult.success) {
 
     private fun findFalconeAPI(token: String, planetNames: List<String>, vehicleNames: List<String>): Deferred<String> = CoroutineScope(Dispatchers.IO).async {
         val url = URL("https://findfalcone.geektrust.com/find")
+        Log.i("FindFalcone", "Token: $token, Planet names: $planetNames, Vehicle names: $vehicleNames")
+
         (url.openConnection() as? HttpURLConnection)?.run {
             try {
                 connect()
